@@ -17,6 +17,12 @@ module.exports = function () {
     let ResourceModel = resources[ resourceType ];
     
     
+    /* Check for custom endpoints */
+    if ( ResourceModel.getRouter ) {
+      router.use( '/' + resourceType, ResourceModel.getRouter() );
+    }
+    
+    
     /* GET endpoint for resource */
     router.get( '/' + resourceType + '/:resource_id', function ( req, res, next ) {
       
