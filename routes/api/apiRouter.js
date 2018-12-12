@@ -7,9 +7,10 @@ const router = express.Router();
 const helloWorldRouter = require( './helloWorld' );
 const resourceRouter = require( './resources' );
 
-router.use( '/helloWorld/', helloWorldRouter() );
-router.use( '/', resourceRouter() );
-
 module.exports = function () {
+  
+  router.use( '/helloWorld/', helloWorldRouter() );
+  router.use( '/', resourceRouter() );
+  
   return router;
 };

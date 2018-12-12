@@ -6,12 +6,16 @@
 let express = require( 'express' );
 let router = express.Router();
 let resources = require( '../../resources/resources' );
+let mongoose = require( 'mongoose' );
 
 
 module.exports = function () {
   
   /* For each listed resource */
-  resources.resourceList.forEach( function ( resourceType ) {
+  for( let i = 0; i < resources.resourceList.length; i++ ) {
+    
+    /* The type of resource */
+    const resourceType = resources.resourceList[ i ];
     
     /* The model for the corresponding resource */
     let ResourceModel = resources[ resourceType ];
@@ -26,14 +30,21 @@ module.exports = function () {
     /* GET endpoint for resource */
     router.get( '/' + resourceType + '/:resource_id', function ( req, res, next ) {
       
+      /* The id of the resource to return */
       let resource_id = req.params[ 'resource_id' ];
       
-      console.log( "GET " + resourceType + " " + resource_id );
+      /* Check if the id is valid */
+      if ( !mongoose.Types.ObjectId.isValid( resource_id ) ) {
+        next( { status: 400, message: resource_id + " is not a valid " + resourceType + " id."} );
+        return;
+      }
       
-      ResourceModel.findOne( { _id: resource_id }, function ( error, document ) {
+      /* Retrieve the document  */
+      ResourceModel.findById( resource_id, function ( error, document ) {
         
         if ( error ) {
           next( { status: 500, message: "Error retrieving " + resourceType + " from database." } );
+          console.error( error );
           return;
         }
         
@@ -102,8 +113,15 @@ module.exports = function () {
     
     /* DELETE endpoint for resource */
     router.delete( '/' + resourceType + '/:resource_id', function ( req, res, next ) {
-      
+  
+      /* The id of the resource to delete */
       let resource_id = req.params[ 'resource_id' ];
+  
+      /* Check if the id is valid */
+      if ( !mongoose.Types.ObjectId.isValid( resource_id ) ) {
+        next( { status: 400, message: resource_id + " is not a valid " + resourceType + " id."} );
+        return;
+      }
       
       ResourceModel.findByIdAndDelete( resource_id, function ( error, document ) {
         
@@ -116,7 +134,7 @@ module.exports = function () {
         
       } );
     } );
-  } );
+  }
   
   return router;
 };
