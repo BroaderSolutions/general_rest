@@ -2,10 +2,14 @@
  * Created by GrantBroadwater on 12/11/18.
  */
 
-var express = require( 'express' );
-var router = express.Router();
-var helloWorldRouter = require( './helloWorld' );
+const express = require( 'express' );
+const router = express.Router();
+const helloWorldRouter = require( './helloWorld' );
+const resourceRouter = require( './resources' );
 
-router.use( '/helloWorld/', helloWorldRouter );
+router.use( '/helloWorld/', helloWorldRouter() );
+router.use( '/', resourceRouter() );
 
-module.exports = router;
+module.exports = function () {
+  return router;
+};

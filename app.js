@@ -8,6 +8,8 @@ var errorRouter = require( './routes/error' );
 
 var app = express();
 
+var mongoose = require( 'mongoose' );
+
 // view engine setup
 app.set( 'views', path.join( __dirname, 'views' ) );
 app.set( 'view engine', 'jade' );
@@ -18,7 +20,14 @@ app.use( express.urlencoded( { extended: false } ) );
 app.use( cookieParser() );
 app.use( express.static( path.join( __dirname, 'public' ) ) );
 
-app.use( '/api/', apiRouter );
-app.use( errorRouter );
+mongoose.connect( 'mongodb://localhost/generalrest', { useNewUrlParser: true } );
+let dbConnection = mongoose.connection;
+dbConnection.on('error', console.error.bind(console, 'connection error:'));
+dbConnection.once('open', function() {
+  console.log( "DB connection established." );
+});
+
+app.use( '/api/', apiRouter() );
+app.use( errorRouter() );
 
 module.exports = app;
